@@ -44,17 +44,14 @@ public class VerveController {
             Boolean isNewId = redisTemplate.opsForValue().setIfAbsent(key, "1", 1, TimeUnit.MINUTES);
 
             if (Boolean.TRUE.equals(isNewId)) {
-                // ID is unique within the time window
                 uniqueCount.incrementAndGet();
 
-                // Optional: Fire HTTP request to external endpoint if provided
                 if (endpoint != null && !endpoint.isEmpty()) {
                     fireHttpRequest(endpoint);
                 }
 
                 return ResponseEntity.ok("ok");
             } else {
-                // ID has already been processed
                 return ResponseEntity.ok("Duplicate request, ignoring.");
             }
         } catch (Exception e) {
