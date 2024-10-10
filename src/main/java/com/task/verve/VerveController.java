@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,7 +31,6 @@ public class VerveController {
     REQUEST_TYPE request_type = REQUEST_TYPE.POST;
 
     private static final Logger logger = LoggerFactory.getLogger(VerveController.class);
-    private final ConcurrentHashMap<Integer, Boolean> uniqueIds = new ConcurrentHashMap<>();
     private final AtomicInteger uniqueCount = new AtomicInteger(0);
     private static final String ID_PREFIX = "request_id_"; // Key prefix for Redis
 
