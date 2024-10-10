@@ -23,9 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/api/verve")
 public class VerveController {
 
+    public enum REQUEST_TYPE {
+        GET, POST;
+    }
+
     @Autowired
     private StringRedisTemplate redisTemplate; // Inject Redis template
-
+    REQUEST_TYPE request_type = REQUEST_TYPE.POST;
 
     private static final Logger logger = LoggerFactory.getLogger(VerveController.class);
     private final ConcurrentHashMap<Integer, Boolean> uniqueIds = new ConcurrentHashMap<>();
@@ -61,13 +65,31 @@ public class VerveController {
         }
     }
 
+
     private void fireHttpRequest(String endpoint) {
         try {
             HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
+
+            HttpRequest get_request = HttpRequest.newBuilder()
                 .uri(URI.create(endpoint + "?count=" + uniqueCount.get()))
                 .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String jsonData = "{\"uniqueCount\":" + uniqueCount.get() + "}";
+
+            HttpRequest post_request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonData))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            HttpResponse<String> response = null;
+            if(request_type == REQUEST_TYPE.GET) {
+                response = client.send(get_request, HttpResponse.BodyHandlers.ofString());
+            }
+            else if(request_type == REQUEST_TYPE.POST) {
+                response = client.send(post_request, HttpResponse.BodyHandlers.ofString());
+            }
+
 
             logger.info("HTTP GET to {} returned status code {}", endpoint, response.statusCode());
         } catch (Exception e) {

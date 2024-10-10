@@ -34,4 +34,5 @@ public class UniqueRequestLogger {
         uniqueIds.clear(); // Clear the map
         logger.info("Unique request count in the last minute: {}", count);
     }
+
 }
